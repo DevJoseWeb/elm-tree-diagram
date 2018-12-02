@@ -1,7 +1,7 @@
 module TreeDiagram exposing
-    ( Tree, node
+    ( Tree(..), node
     , Coord, Drawable, NodeDrawer, EdgeDrawer, draw_
-    , TreeLayout, defaultTreeLayout, TreeOrientation, leftToRight, rightToLeft, bottomToTop, topToBottom
+    , TreeLayout, defaultTreeLayout, TreeOrientation, leftToRight, rightToLeft, bottomToTop, topToBottom, flatten
     )
 
 {-| This library provides functions drawing diagrams of trees.
@@ -556,6 +556,11 @@ ends list =
 
 {-| Apply a function to the value of each node in a tree to produce a new tree.
 -}
-treeMap : (a -> a) -> Tree a -> Tree a
+treeMap : (a -> b) -> Tree a -> Tree b
 treeMap fn (Node v children) =
     Node (fn v) (List.map (treeMap fn) children)
+
+{-| Flattens a tree into a list
+-}
+flatten : Tree a -> List a
+flatten (Node v children) = v :: (List.concatMap flatten children)
