@@ -1,7 +1,8 @@
 module TreeDiagram exposing
     ( Tree(..), node
     , Coord, Drawable, NodeDrawer, EdgeDrawer, draw_
-    , TreeLayout, defaultTreeLayout, TreeOrientation, leftToRight, rightToLeft, bottomToTop, topToBottom, flatten
+    , TreeLayout, defaultTreeLayout, TreeOrientation, leftToRight, rightToLeft, bottomToTop, topToBottom
+    , flatten, mapTree
     )
 
 {-| This library provides functions drawing diagrams of trees.
@@ -167,7 +168,7 @@ position siblingDistance subtreeDistance levelHeight layout tree =
                     TopToBottom ->
                         ( x - width / 2, -y + height / 2 )
     in
-    treeMap (\( v, coord ) -> ( v, transform coord )) finalTree
+    mapTree (\( v, coord ) -> ( v, transform coord )) finalTree
 
 
 {-| Function for drawing an already-positioned tree.
@@ -556,11 +557,13 @@ ends list =
 
 {-| Apply a function to the value of each node in a tree to produce a new tree.
 -}
-treeMap : (a -> b) -> Tree a -> Tree b
-treeMap fn (Node v children) =
-    Node (fn v) (List.map (treeMap fn) children)
+mapTree : (a -> b) -> Tree a -> Tree b
+mapTree fn (Node v children) =
+    Node (fn v) (List.map (mapTree fn) children)
+
 
 {-| Flattens a tree into a list
 -}
 flatten : Tree a -> List a
-flatten (Node v children) = v :: (List.concatMap flatten children)
+flatten (Node v children) =
+    v :: List.concatMap flatten children
